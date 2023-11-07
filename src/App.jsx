@@ -19,14 +19,8 @@ loader.init().then((monaco) => {
 
 function App() {
   const [currentWord, setCurrentWord] = useState("");
-
-  function splitText(text) {
-    const codeBlock = text.split("\n");
-    const currentLine = codeBlock[codeBlock.length + 1];
-    console.log(currentLine);
-    console.log(codeBlock);
-    setCurrentWord(currentLine);
-  }
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("")
 
   const handleClick = () => {
     var code = currentWord.replace(/\r/g, "");
@@ -44,14 +38,34 @@ function App() {
     
   };
 
+  const onChangeCurrentWord = (value) => {
+    setCurrentWord(value);
+
+    var code = value.replace(/\r/g, "");
+
+    const response = validateSintaxis(code);
+
+    console.log(response)
+
+    if(response === undefined){
+      setType("success")
+      setMessage("Compilacion exitosa")
+    } else if (response.error) {
+      setType("error")
+      setMessage(`Error en la linea ${response.line}, ${response.message}`)
+    } 
+  }
+
   return (
     <div>
       <h1>Lando Language</h1>
+      <p id={`${type}-text`}>{message}</p>
       <Editor
         height="70vh"
         theme="vs-dark"
         language="lando"
-        onChange={(value) => setCurrentWord(value)}
+        // onChange={(value) => setCurrentWord(value)}
+        onChange={(value) => onChangeCurrentWord(value)}
         options={{
           fontSize: 20,
           minimap: {
@@ -63,7 +77,7 @@ function App() {
         }}
       />
       <div className="right">
-      <button onClick={() => handleClick()}>Verificar sintaxis</button>
+      {/* <button onClick={() => handleClick()}>Verificar sintaxis</button> */}
       </div>
     </div>
   );
